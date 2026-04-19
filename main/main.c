@@ -4,7 +4,7 @@
 #include "freertos/FreeRTOS.h"
 #include "freertos/task.h"
 #include "driver/gpio.h"
-#include "driver/timer.h"
+#include "driver/gptimer.h"
 #include "esp_timer.h"
 #include "esp_adc/adc_cali_scheme.h"
 #include "esp_adc/adc_cali.h"
@@ -144,17 +144,21 @@ void app_main() {
 
 
     //Timer para el ADC
-    timer_config_t timer_pro= {
-        .divider = 80,
-        .counter_dir = TIMER_COUNT_UP,
-        .counter_en = TIMER_PAUSE,
-        .alarm_en = TIMER_ALARM_DIS,
-        .auto_reload = false,
+    gptimer_config_t timer_pro = {
+    .clk_src = GPTIMER_CLK_SRC_DEFAULT,
+    .direction = GPTIMER_COUNT_UP,
+    .resolution_hz = 1000000  // equivalente a divider=80
     };
+    gptimer_handle_t adc_timer = NULL;
+    
+    gptimer_new_timer(&timer_pro, &adc_timer);
 
-    timer_init(TIMER_GROUP_0, TIMER_0, &timer_pro);
-    timer_set_counter_value(TIMER_GROUP_0,TIMER_0,0);
-    timer_start(TIMER_GROUP_0, TIMER_0);
+    gptimer_enable(adc_timer);
+
+    gptimer_set_raw_count(adc_timer, 0);
+
+    gptimer_start(adc_timer);
+
     uint64_t timer_value = 0;
     int adc_raw;
  //Configuración del ADC
@@ -217,7 +221,6 @@ void app_main() {
             ledc_update_duty(LEDC_LOW_SPEED_MODE, LEDC_CHANNEL_0);
         }
 
-        if (direccion == 1 && act==0){
             ledc_set_duty(LEDC_LOW_SPEED_MODE, LEDC_CHANNEL_0, 4095);
             ledc_update_duty(LEDC_LOW_SPEED_MODE, LEDC_CHANNEL_0);
             gpio_set_level(DIG1, 1);

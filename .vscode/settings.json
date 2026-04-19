@@ -6,7 +6,7 @@
     "--query-driver=**",
     "--compile-commands-dir=c:\\Users\\PC\\Desktop\\ESP32\\Reto\\build"
   ],
-  "idf.currentSetup": "C:\\Espressif\\v6.0\\esp-idf",
+  "idf.currentSetup": "C:\\esp\\v6.0\\esp-idf",
   "idf.flashType": "UART",
   "idf.portWin": "COM3"
 }
